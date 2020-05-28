@@ -7,4 +7,4 @@ RUN pip3 install cwltool && \
     rm /build-janis.sh && \
     rm -rf janis && \
     mkdir /singularity && \
-    janis init singularity --container_dir /singularity
+    janis init --ensure-cromwell singularity --container_dir /singularity
