@@ -1,5 +1,5 @@
 # janis-docker
-A dockerization of the janis workflow system.
+A dockerization of the [janis workflow system](https://janis.readthedocs.io/en/latest/index.html).
 
 The simplest invocation is
 ```
@@ -58,3 +58,26 @@ $ docker run -it \
     --privileged drtomc/janis:latest janis run -o results WGSGermlineGATK --inputs data/inputs.yaml
 ```
 
+## Caveats
+
+If you are running docker on Windows, or inside a virtual machine in a
+folder shared with a Windows host you may experience failures. The engine
+underneath may attempt to perform some filesystem operations that are
+not supported on Windows filesystems (e.g. `mkfifo`). In such cases,
+it is recommended to make sure any writable volumes are on fully unix
+compatible filesystems.
+
+One way of doing this is to run bash in the container, and run the
+workflow using a container-local directory as the output directory,
+then copy the outputs across:
+
+```
+$ docker run -it \
+    -v ${PWD}/data:/data/:ro \
+    -v ${PWD}/results:/results/:rw \
+    -v ${PWD}/singularity:/singularity/:rw \
+    --privileged drtomc/janis:latest bash
+root@339b601f4ec7:/# janis run -o local-results WGSGermlineGATK --inputs data/inputs.yaml
+...
+root@339b601f4ec7:/# cp -r local-results/ results/
+```
